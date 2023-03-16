@@ -70,43 +70,137 @@ void compare(Node* head, string version1, string version2) {
     }
 }
 
+void remove(Node** head_ref, string version) {
+    Node* current = *head_ref;
+    Node* prev = NULL;
+
+    // Traverse the list to find the node with the given version
+    while (current != NULL && current->version != version) {
+        prev = current;
+        current = current->next;
+    }
+
+    // If the version is not found, print an error message
+    if (current == NULL) {
+        cout << "Version " << version << " not found in the list." << endl;
+        return;
+    }
+
+    // Remove the node with the given version
+    if (prev == NULL) {
+        *head_ref = current->next;
+    }
+    else {
+        prev->next = current->next;
+    }
+    delete current;
+}
+
+// Define the function to load a version
+Node* load(Node* head, string version) {
+    Node* current = head;
+    while (current != NULL) {
+        if (current->version == version) {
+            return current;
+        }
+        current = current->next;
+    }
+    cout << "Version " << version << " not found in the list." << endl;
+    return NULL;
+}
+
+// Define the function to search versions for a keyword
+void search(Node* head, string keyword) {
+    Node* current = head;
+    bool found = false;
+
+    while (current != NULL) {
+        if (current->version.find(keyword) != string::npos) {
+            cout << current->version << endl;
+            found = true;
+        }
+        current = current->next;
+    }
+
+    if (!found) {
+        cout << "No versions found containing the keyword '" << keyword << "'." << endl;
+    }
+}
+
 int main() {
     Node* head = NULL;
+    string current_version;
+
+    cout << "Welcome to the Comp322 file versioning system!\n" << endl;
 
     while (true) {
-        cout << "Welcome to the version control system." << endl;
-        cout << "Choose an option:" << endl;
-        cout << "1. Add a new version" << endl;
-        cout << "2. Print the list of all versions" << endl;
-        cout << "3. Compare 2 versions" << endl;
-        cout << "4. Exit" << endl;
+        cout << "To add the content of your file to version control press 'a'" << endl;
+        cout << "To remove a version press 'r'" << endl;
+        cout << "To load a version press 'l'" << endl;
+        cout << "To print to the screen the detailed list of all versions press 'p'" << endl;
+        cout << "To compare any 2 versions press 'c'" << endl;
+        cout << "To search versions for a keyword press 's'" << endl;
+        cout << "To exit press 'e'" << endl;
 
-        int choice;
-        cin >> choice;
+        char option;
+        cin >> option;
 
-        if (choice == 1) {
-            string new_version;
-            cout << "Enter the version number: ";
-            cin >> new_version;
-            insert(&head, new_version);
-            cout << "Version " << new_version << " added." << endl;
-        }
-        else if (choice == 2) {
-            cout << "List of all versions:" << endl;
-            print(head);
-        }
-        else if (choice == 3) {
-            string version1, version2;
-            cout << "Enter the first version number: ";
-            cin >> version1;
-            cout << "Enter the second version number: ";
-            cin >> version2;
-            compare(head, version1, version2);
-        }
-        else if (choice == 4) {
-            cout << "Exiting version control system." << endl;
-            break;
+        switch(option) {
+            case 'a': {
+                cout << "Enter the version name to be added: ";
+                cin >> current_version;
+                insert(&head, current_version);
+                cout << "Version " << current_version << " has been added to version control." << endl;
+                break;
+            }
+            case 'r': {
+                cout << "Enter the version name to be removed: ";
+                cin >> current_version;
+                remove(&head, current_version);
+                break;
+            }
+            case 'l': {
+                cout << "Enter the version name to be loaded: ";
+                cin >> current_version;
+                if (load(head, current_version)) {
+                    cout << "Version " << current_version << " has been loaded." << endl;
+                }
+                else {
+                    cout << "Version " << current_version << " not found in the list." << endl;
+                }
+                break;
+            }
+            case 'p': {
+                cout << "List of all versions:" << endl;
+                print(head);
+                break;
+            }
+            case 'c': {
+                string version1, version2;
+                cout << "Enter the name of the first version: ";
+                cin >> version1;
+                cout << "Enter the name of the second version: ";
+                cin >> version2;
+                compare(head, version1, version2);
+                break;
+            }
+            case 's': {
+                string keyword;
+                cout << "Enter the keyword to search for: ";
+                cin >> keyword;
+                search(head, keyword);
+                break;
+            }
+            case 'e': {
+                cout << "Exiting program..." << endl;
+                return 0;
+            }
+            default: {
+                cout << "Invalid option. Please try again." << endl;
+                break;
+            }
         }
 
+        cout << endl;
     }
 }
